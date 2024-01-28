@@ -43,7 +43,7 @@ async function pinFile(file){
         if(Data) return Data
     }
     catch(err){
-        console.log(err);1223
+        console.log(err);
         throw {success:false}
     }
 

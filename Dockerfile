@@ -1,8 +1,6 @@
 FROM node:alpine
 RUN apk update \
-    && apk add --no-cache gcc g++ python3 python3-dev
-ENV CC=/usr/bin/gcc
-ENV CXX=/usr/bin/g++
+    && apk add --no-cache python3 python3-dev
 WORKDIR /ToneCraft
 COPY package.json /ToneCraft
 RUN npm install

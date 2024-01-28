@@ -6,6 +6,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const morgan=require('morgan');
+const untildify = require('untildify');
 
 const upload = multer( {dest: 'uploads/' });
 require('dotenv').config()
@@ -68,7 +69,6 @@ app.post('/api/upload',upload.single('audio') ,async (req, res) => {
             console.log("Starting child")
         })
         process.on('exit',()=>{
-            console.log(fs.readdirSync());
             pinFile({path:'combined_audio.mp3',filename:req.file.filename}).then((data)=>{
                 res.json(data);
                 clearUpload();

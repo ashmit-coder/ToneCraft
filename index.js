@@ -30,7 +30,7 @@ function clearUpload(){
 }
 
 async function pinFile(file){
-   const fileStream =  fs.createReadStream(path.join(__dirname,file.path));
+   const fileStream =  fs.createReadStream(path.resolve(__dirname,file.path));
    const options = {
     pinataMetadata: {
                 name: file.filename
@@ -63,7 +63,7 @@ app.post('/api/upload',upload.single('audio') ,async (req, res) => {
 
     try{    
         var spawn = require("child_process").execFile;
-        var process = spawn('python3',['dummy.py',path.join(__dirname,req.file.path)]);
+        var process = spawn('python3',['dummy.py',path.resolve(__dirname,req.file.path)]);
         process.on('exit',()=>{
             pinFile({path:'combined_audio.mp3',filename:req.file.filename}).then((data)=>{
                 res.json(data);

@@ -63,7 +63,7 @@ app.post('/api/upload',upload.single('audio') ,async (req, res) => {
         var spawn = require("child_process").execFile;
         var process = spawn('python3',['dummy.py',path.join(__dirname,req.file.path)]);
         process.on('exit',()=>{
-            pinFile({path:'combined_audio.mp3',filename:req.file.filename}).then((data)=>{
+            pinFile({path: path.resolve(__dirname,'./combined_audio.mp3'),filename:req.file.filename}).then((data)=>{
                 res.json(data);
                 clearUpload();
             })

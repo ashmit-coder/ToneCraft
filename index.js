@@ -28,7 +28,7 @@ function clearUpload(){
 }
 
 async function pinFile(file){
-   const fileStream =  fs.createReadStream(path.join(__dirname,file.path));
+   const fileStream =  fs.createReadStream(file.path);
    const options = {
     pinataMetadata: {
                 name: file.filename

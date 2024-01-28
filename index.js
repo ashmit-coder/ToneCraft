@@ -5,12 +5,14 @@ const fs = require('fs');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const morgan=require('morgan');
 
 const upload = multer( {dest: 'uploads/' });
 require('dotenv').config()
 const PORT = process.env.PORT || 5000;
 const pinata = new pinataSdk(process.env.PINATA_API_KEY, process.env.PINATA_API_SECRET);
 
+app.use(morgan("combined"))
 app.use(express.json({limit:"200mb"}));
 app.use(express.urlencoded({limit:"200mb",extended: true ,parameterLimit:5000}));
 app.use(cors());
@@ -28,7 +30,7 @@ function clearUpload(){
 }
 
 async function pinFile(file){
-   const fileStream =  fs.createReadStream(file.path);
+   const fileStream =  fs.createReadStream(path.join(__dirname,file.path));
    const options = {
     pinataMetadata: {
                 name: file.filename
@@ -63,7 +65,7 @@ app.post('/api/upload',upload.single('audio') ,async (req, res) => {
         var spawn = require("child_process").execFile;
         var process = spawn('python3',['dummy.py',path.join(__dirname,req.file.path)]);
         process.on('exit',()=>{
-            pinFile({path: path.resolve(__dirname,'./combined_audio.mp3'),filename:req.file.filename}).then((data)=>{
+            pinFile({path:'combined_audio.mp3',filename:req.file.filename}).then((data)=>{
                 res.json(data);
                 clearUpload();
             })

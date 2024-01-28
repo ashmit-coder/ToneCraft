@@ -111,22 +111,22 @@ app.post('/api/nft',async (req, res) => {
     return res;
 });
 
-app.get('/test', async (req, res) => {
+// app.get('/test', async (req, res) => {
 
-    try{    
-        var spawn = require("child_process").execFile;
-        var process = spawn('python3',['dummy.py','./uploads/manas.pdf']);
+//     try{    
+//         var spawn = require("child_process").execFile;
+//         var process = spawn('python3',['dummy.py','./uploads/manas.pdf']);
     
         
-        process.on('exit',(e)=>{
-            // console.log(fs.readdirSync());
-            console.log("exit")})
-    }
-    catch(err){
-        console.log(err);
-    }
-    return res.send("yyyy")
-})
+//         process.on('exit',(e)=>{
+//             // console.log(fs.readdirSync());
+//             console.log("exit")})
+//     }
+//     catch(err){
+//         console.log(err);
+//     }
+//     return res.send("yyyy")
+// })
 
 app.listen(PORT, () => {
     console.log('Listening to port 5000....');

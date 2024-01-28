@@ -7,7 +7,7 @@ files = {'file': open(sys.argv[1], 'rb')}
 response = requests.post(api_url, files=files)
 print("python running")
 if response.status_code == 200:
-    with open(sys.argv[2], "wb") as file:
+    with open('combined_audio.mp3', "wb") as file:
         file.write(response.content)
 else:
     print(f"Request failed with status code: {response.status_code}")

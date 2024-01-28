@@ -63,8 +63,12 @@ app.post('/api/upload',upload.single('audio') ,async (req, res) => {
 
     try{    
         var spawn = require("child_process").execFile;
-        var process = spawn('python3',['dummy.py',path.resolve(__dirname,req.file.path),path.resolve(__dirname,'combined_audio.mp3')]);
+        var process = spawn('python3',['dummy.py',path.resolve(__dirname,req.file.path)]);
+        process.on('spawn',()=>{
+            console.log("Starting child")
+        })
         process.on('exit',()=>{
+            console.log(fs.readdirSync());
             pinFile({path:'combined_audio.mp3',filename:req.file.filename}).then((data)=>{
                 res.json(data);
                 clearUpload();
@@ -107,20 +111,22 @@ app.post('/api/nft',async (req, res) => {
     return res;
 });
 
-// app.get('/test', async (req, res) => {
+app.get('/test', async (req, res) => {
 
-//     try{    
-//         var spawn = require("child_process").execFile;
-//         var process = spawn('python3',['dummy.py','./uploads/manas.pdf']);
+    try{    
+        var spawn = require("child_process").execFile;
+        var process = spawn('python3',['dummy.py','./uploads/manas.pdf']);
     
         
-//         process.on('exit',(e)=>console.log(e))
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-//     return res.send("yyyy")
-// })
+        process.on('exit',(e)=>{
+            // console.log(fs.readdirSync());
+            console.log("exit")})
+    }
+    catch(err){
+        console.log(err);
+    }
+    return res.send("yyyy")
+})
 
 app.listen(PORT, () => {
     console.log('Listening to port 5000....');

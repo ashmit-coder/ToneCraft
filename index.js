@@ -16,8 +16,8 @@ app.use(express.urlencoded({limit:"200mb",extended: true ,parameterLimit:5000}))
 app.use(cors());
 
 function Verify(req, res, next) {
-    const { user, password } = req.query;
-    if(user !== process.env.USER_ID && password !== process.env.PASSWORD) return res.redirect('/');
+    // const { user, password } = req.query;
+    // if(user !== process.env.USER_ID && password !== process.env.PASSWORD) return res.redirect('/');
     next();
 }
 

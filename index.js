@@ -5,6 +5,7 @@ const fs = require('fs');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const { default: axios } = require('axios');
 const morgan=require('morgan');
 
 
@@ -62,35 +63,49 @@ app.use(Verify);
 
 app.post('/api/upload',upload.single('audio') ,async (req, res) => {
 
-    try{    
-        var spawn = require("child_process").execFile;
-        var process = spawn('python3',['dummy.py',path.resolve(__dirname,req.file.path)]);
-        process.on('spawn',()=>{
-            console.log("Starting child")
+    try {
+
+        const files = fs.readFileSync(path.resolve(__dirname,`./uploads/${req.file.filename}`));
+
+        const form = new FormData();
+        
+        form.append('file',files);
+
+        const response =  await axios.post(`${process.env.ML_URL}upload/`,files, {
+            headers: {
+                'Content-Type':'multipart/form-data'
+            },
+            responseType:"arraybuffer"
+        });
+
+        const audioBuffer = Buffer.from(response.data);
+        const audioFilePath = 'combined_audio.mp3';
+        
+        const file = fs.writeFileSync(audioFilePath,audioBuffer,{encoding:"binary"});
+         
+        pinFile({path:path.resolve(__dirname,"./combined_audio.mp3"), filename:req.file.filename }).
+        then(result=>{
+            res.json(result);
+            clearUpload();
+            fs.rm(path.join(__dirname,"./combined_audio.mp3"),()=>{
+                console.log("file deleted")
+            });
         })
-        process.on('exit',()=>{
-            pinFile({path:'combined_audio.mp3',filename:req.file.filename}).then((data)=>{
-                res.json(data);
-                clearUpload();
-            })
-            .catch((err) => {
-                console.log(err)
-                res.status(500).json(err)
-            })
+        .catch(err=>{
+            res.status(500).json(err);
         })
+        
+    } 
+    catch (error) {
+        console.log(error);
+        return res.status(500).send('Internal Server Error');
     }
-    catch(err){
-        console.log(err);
-        res.status(500).json(err)
-    }
-    
-    
 
     return res;
 });
 
 app.post('/api/nft',async (req, res) => {
-    console.log("I am here master");
+    
     try{
     const options = {
         pinataOptions: {
@@ -100,32 +115,54 @@ app.post('/api/nft',async (req, res) => {
     const body=JSON.parse(req.body.data);
     console.log(req.body,"request body");
     const result = await pinata.pinJSONToIPFS(body, options);
-    console.log(result+"result");
+
     res.json(result);
     }
     catch(err){
-        res.status(500).json(err);
+        console.log(err);
+        res.status(500).send("Internal Server Error");
     }
  
-
     return res;
 });
 
 // app.get('/test', async (req, res) => {
 
-//     try{    
-//         var spawn = require("child_process").execFile;
-//         var process = spawn('python3',['dummy.py','./uploads/manas.pdf']);
-    
+//     try {
+      
+//         const files = fs.readFileSync(path.resolve(__dirname,'./uploads/manas.pdf'));
+
+//         const form = new FormData();
         
-//         process.on('exit',(e)=>{
-//             // console.log(fs.readdirSync());
-//             console.log("exit")})
+//         form.append('file',files);
+
+//         const response =  await axios.post('http://127.0.0.1:5000/upload/',files, {
+//             headers: {
+//                 'Content-Type':'multipart/form-data'
+//             },
+//             responseType:"arraybuffer"
+//         });
+ 
+//         const audioBuffer = Buffer.from(response.data);
+//         const audioFilePath = 'combined_audio.mp3';
+        
+//         const file = fs.writeFileSync(audioFilePath,audioBuffer,{encoding:"binary"})
+//         let result = await pinFile({path:path.resolve(__dirname,"./combined_audio.mp3"), filename:"hmm" });
+//         if(result){
+
+//             clearUpload();
+//             fs.rm(path.join(__dirname,"./combined_audio.mp3"),()=>{
+//             console.log("Removing audio file")
+//             });
+    
+//         }
+//         return res.json(result);
+
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).send('Internal Server Error');
 //     }
-//     catch(err){
-//         console.log(err);
-//     }
-//     return res.send("yyyy")
+
 // })
 
 app.listen(PORT, () => {
